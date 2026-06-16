@@ -1,12 +1,211 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>Poland (LOVE) Tracksuit Base</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poland LOVE WEAR tracksuit</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #1f1f1f, #444);
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+#app {
+    display: none;
+}
+
+button {
+    display: block;
+    width: 300px;
+    margin: 10px auto;
+    padding: 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    background: #00bcd4;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0097a7;
+}
+
+#output {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+}
+a {
+    color: #00ffcc;
+    text-decoration: none;
+}
+</style>
 </head>
+
 <body>
-    <h1>🔥 Licznik dni w dresach 🔥</h1>
-    <p>Dni w dresach: 0</p>
-    <button>✅ Byłem dziś w dresach</button>
+
+<h1>Poland LOVE WEAR tracksuit</h1>
+
+<div id="loading">
+    <h2>⏳ Ładowanie systemu...</h2>
+</div>
+
+<div id="app">
+
+<button onclick="losujDres()">1. Wylosuj dres</button>
+<button onclick="bylemWDresach()">2. Byłem dziś w dresach</button>
+<button onclick="jakNosic()">3. Jak nosić dresy</button>
+<button onclick="polecane()">4. Polecane dresy</button>
+<button onclick="discord()">5. Discord</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+setTimeout(() => {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    login();
+}, 5000);
+
+const dresy = [
+{
+name:"Nike Tech Fleece",
+url:"https://www.nike.com/pl/"
+},
+{
+name:"Cusbclo - Czarne",
+url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-schwarz"
+},
+{
+name:"Cusbclo - Szare grafitowe",
+url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-anthrazit"
+},
+{
+name:"Cusbclo - Granatowe",
+url:"https://www.cusbclo.com/collections/tracksuits-2025/products/navy-jogger"
+},
+{
+name:"Cusbclo - Zielone",
+url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-bronze-green"
+},
+{
+name:"Cusbclo - Rich red",
+url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red"
+}
+];
+
+let users = JSON.parse(localStorage.getItem("users")) || {};
+let currentUser = "";
+
+function login(){
+let nick = prompt("Podaj nick:");
+
+if(!nick){ login(); return; }
+
+currentUser = nick.trim();
+
+if(!users[currentUser]){
+users[currentUser] = {
+days:0,
+streak:0,
+lastClick:0,
+dres:"",
+dresDays:0
+};
+}
+
+save();
+updateUI();
+}
+
+function save(){
+localStorage.setItem("users",JSON.stringify(users));
+}
+
+function updateUI(){
+let u = users[currentUser];
+
+document.getElementById("output").innerHTML =
+`👤 <b>${currentUser}</b><br>
+🔥 Passa: <b>${u.streak}</b><br>
+📅 Dni: <b>${u.days}</b><br>
+👕 Dres: <b>${u.dres || "brak"}</b>`;
+}
+
+function losujDres(){
+let u = users[currentUser];
+
+if(u.dresDays > 0){
+u.dresDays--;
+save();
+updateUI();
+return;
+}
+
+let d = dresy[Math.floor(Math.random()*dresy.length)];
+let days = Math.floor(Math.random()*5)+1;
+
+u.dres = d.name;
+u.dresDays = days;
+
+save();
+updateUI();
+}
+
+function bylemWDresach(){
+let u = users[currentUser];
+let now = Date.now();
+
+if(u.lastClick && now - u.lastClick < 86400000){
+alert("Już kliknięte dziś");
+return;
+}
+
+if(u.lastClick){
+let diff = Math.floor((now - u.lastClick)/86400000);
+
+if(diff===1) u.streak++;
+else u.streak=0;
+}else{
+u.streak=1;
+}
+
+u.days++;
+u.lastClick = now;
+
+save();
+updateUI();
+}
+
+function jakNosic(){
+document.getElementById("output").innerHTML =
+"👕 Styl dresowy = wygoda + sneakersy + pewność siebie";
+}
+
+function polecane(){
+let html = "🔥 Polecane dresy:<br><br>";
+
+dresy.forEach(d=>{
+html += `<a href="${d.url}" target="_blank">${d.name}</a><br>`;
+});
+
+document.getElementById("output").innerHTML = html;
+}
+
+function discord(){
+window.location.href="https://discord.com/";
+}
+
+</script>
+
 </body>
 </html>
