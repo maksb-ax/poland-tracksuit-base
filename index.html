@@ -138,7 +138,7 @@ document.getElementById("output").innerHTML =
 `👤 <b>${currentUser}</b><br>
 🔥 Passa: <b>${u.streak}</b><br>
 📅 Dni: <b>${u.days}</b><br>
-👕 Dres na dziś: <b>${u.dres || "brak"}</b>`;
+👕 Dresy na dziś: <b>${u.dres || "brak"}</b>`;
 }
 
 function losujDres(){
@@ -152,7 +152,7 @@ return;
 }
 
 let d = dresy[Math.floor(Math.random()*dresy.length)];
-let days = Math.floor(Math.random()*5)+1;
+let days = Math.floor(Math.random()*3)+1;
 
 u.dres = d.name;
 u.dresDays = days;
