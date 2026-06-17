@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
 
+<!-- Nowe, pewne źródło biblioteki Supabase, które na 100% się załaduje -->
+<script src="https://cloudflare.com"></script>
+
 <style>
 body {
     background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('tlo.jpg');
@@ -50,7 +53,7 @@ input, button {
     display: block;
     margin: 15px auto;
     padding: 15px;
-    width: 300px; /* NAPRAWIONE: Szerokość przycisków przywrócona do normy */
+    width: 300px;
     box-sizing: border-box;
     border-radius: 12px;
     border: none;
@@ -147,16 +150,11 @@ a:hover {
     <div id="output"></div>
 </div>
 
-<!-- DOŁĄCZONA BEZPOŚREDNIO BIBLIOTEKA SUPABASE, KTÓRA OMIJA BŁĄD BLOKOWANIA LINKÓW CDN -->
-<script>
-!function(e,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((e="undefined"!=typeof globalThis?globalThis:e||self).supabase={})}(this,(function(e){"use strict";class r{constructor(e,r){this.supabaseUrl=e,this.supabaseKey=r}from(e){return{insert:async r=>(await fetch(`${this.supabaseUrl}/rest/v1/${e}`,{method:"POST",headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(r)}).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))),select:function(r="*"){let t=`${this.supabaseUrl}/rest/v1/${e}?select=${r}`,a={headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`}};const n={eq:function(e,r){return t+=`&${e}=eq.${encodeURIComponent(r)}`,n},order:function(e,r={ascending:!1}){return t+=`&order=${e}.${r.ascending?"asc":"desc"}`,n},limit:function(e){return t+=`&limit=${e}`,n},maybeSingle:async()=>(await fetch(t,{method:"GET",headers:a.headers}).then((async e=>{const r=await e.json();return e.ok?{data:r.length?r[0]:null,error:null}:{data:null,error:r}}))),single:async()=>(await fetch(t,{method:"GET",headers:a.headers}).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))),then:async function(e){return fetch(t,{method:"GET",headers:a.headers}).then((async r=>{const t=await r.json();return r.ok?e({data:t,error:null}):e({data:null,error:t})}))}};return n}.bind(this),update:function(r){let t=`${this.supabaseUrl}/rest/v1/${e}`,a={method:"PATCH",headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(r)};const n={eq:async function(e,r){return t+=`?${e}=eq.${encodeURIComponent(r)}`,await fetch(t,a).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))}};return n}.bind(this)}}}e.createClient=function(e,t){return new r(e,t)},Object.defineProperty(e,"__esModule",{value:!0})}));
-</script>
-
-<!-- GŁÓWNY SYSTEM TWOJEJ STRONY -->
 <script>
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
+// Inicjalizacja z oficjalnego skryptu Supabase
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
@@ -206,10 +204,10 @@ async function register(){
         best_streak:0,
         total_days:0,
         dres:""
-    }]);
+    }]).select();
 
     if(error){
-        alert("Błąd bazy: " + (error.message || JSON.stringify(error)));
+        alert("Błąd bazy: " + error.message);
         return;
     }
 
@@ -226,15 +224,15 @@ async function login(){
         return;
     }
 
-    const {data,error}=await client
+    const {data, error}=await client
     .from("users")
     .select("*")
-    .eq("username",username)
-    .eq("password",password)
+    .eq("username", username)
+    .eq("password", password)
     .maybeSingle();
 
    if(error){
-    alert(error.message || JSON.stringify(error));
+    alert("Błąd logowania: " + error.message);
     return;
 }
 
@@ -281,7 +279,7 @@ function losujDres(){
         await client
         .from("users")
         .update({dres:chosen})
-        .eq("username",currentUser.username);
+        .eq("username", currentUser.username);
 
         updateUI();
     },3000);
@@ -291,7 +289,6 @@ function losujDres(){
 async function bylemWDresach(){
     if(!currentUser) return;
     
-    // NAPRAWIONE: Czysty string daty RRRR-MM-DD
     const today = new Date().toISOString().split("T")[0];
 
     if(currentUser.last_click===today){
@@ -303,3 +300,77 @@ async function bylemWDresach(){
 
     if(currentUser.last_click){
         let last=new Date(currentUser.last_click);
+        let now=new Date(today);
+        let diff=(now-last)/(1000*60*60*24);
+
+        if(diff===1){
+            streak=currentUser.streak+1;
+        }
+    }
+
+    let best=Math.max(streak,currentUser.best_streak || 0);
+
+    currentUser.streak=streak;
+    currentUser.best_streak=best;
+    currentUser.total_days=(currentUser.total_days || 0)+1;
+    currentUser.last_click=today;
+
+    await client.from("users")
+    .update({
+        streak,
+        best_streak:best,
+        total_days:currentUser.total_days,
+        last_click:today
+    })
+    .eq("username", currentUser.username);
+
+    updateUI();
+}
+
+/* ===== INFO ===== */
+function jakNosic(){
+    document.getElementById("output").innerHTML=
+    "<div class='profile-stats' style='text-align:center;'>👕 Czarne dresy + sneakersy + hoodie = top styl</div>";
+}
+
+/* ===== POLECANE ===== */
+function polecane(){
+    let html = "<div class='profile-stats' style='text-align:center;'><h3>Polecane dresy</h3>";
+    produkty.forEach(p => {
+        html += `<div style="margin:12px 0;"><a href="${p.url}" target="_blank">👕 ${p.name}</a></div>`;
+    });
+    html += "</div>";
+    document.getElementById("output").innerHTML = html;
+}
+
+/* ===== DISCORD ===== */
+function discord(){
+    window.open("https://discord.com", "_blank");
+}
+
+/* ===== TOP ===== */
+async function showTop(){
+    const {data, error} = await client
+    .from("users")
+    .select("*")
+    .order("best_streak",{ascending:false})
+    .limit(10);
+
+    if(error){
+        alert("Błąd rankingu: " + error.message);
+        return;
+    }
+
+    let html="<h3>TOP PASSA</h3><div class='profile-stats'>";
+    data.forEach((u,i)=>{
+        html += `${i+1}. <b>${u.username}</b> — ${u.best_streak || 0}<br>`;
+    });
+    html += "</div>";
+
+    document.getElementById("topList").innerHTML=html;
+    showScreen("top");
+}
+</script>
+
+</body>
+</html>
