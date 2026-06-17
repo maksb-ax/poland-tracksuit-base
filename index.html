@@ -86,9 +86,9 @@ a:hover{
 
 <script>
 const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
-const SUPABASE_KEY = "TWÓJ_KLUCZ_SUPABASE";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const client = supabase.createClient("https://aimyhgkpjtjjityrsmai.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY)";
 
 let currentUser = null;
 
@@ -143,7 +143,7 @@ async function register(){
         return;
     }
 
-    alert("Konto stworzone");
+    alert("Konto stworzone, GRATULACJE!");
 }
 
 /* ===== LOGIN ===== */
@@ -156,12 +156,18 @@ async function login(){
     .select("*")
     .eq("username",username)
     .eq("password",password)
-    .single();
+    .maybeSingle();
 
-    if(error || !data){
-        alert("Zły login lub hasło");
-        return;
-    }
+   if(error){
+    alert(error.message);
+    console.log(error);
+    return;
+}
+
+if(!data){
+    alert("Zły login lub hasło");
+    return;
+}
 
     currentUser=data;
     showScreen("menu");
