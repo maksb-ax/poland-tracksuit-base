@@ -171,11 +171,12 @@ async function login(){
 /* ===== UI ===== */
 function updateUI(){
     document.getElementById("output").innerHTML=`
-         👤 Nazwa użytkownika: ${currentUser.username}<br>
-        🔥 Passa w dresach: ${currentUser.streak || 0}<br>
-        🏆 Największa passa: ${currentUser.best_streak || 0}<br>
-        📅 Ogółem dresy miał*m na sobie: ${currentUser.total_days || 0} razy<br>
+        👤 Nazwa użytkownika:  ${currentUser.username}<br>
+        🔥 Passa: ${currentUser.streak || 0}<br>
+        🏆 Best passa: ${currentUser.best_streak || 0}<br>
+        📅 Ogółem w dresach był*m: ${currentUser.total_days || 0} razy <br>
         👕 Dresy na dziś: ${currentUser.dres || "brak"}
+    `;
 }
 
 /* ===== LOSOWANIE ===== */
