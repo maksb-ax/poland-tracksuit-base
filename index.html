@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
 
-<script src="https://jsdelivr.net"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body{
@@ -85,10 +85,9 @@ a:hover{
 </div>
 
 <script>
-const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
-// NAPRAWIONE: Usunięto błąd składni (zbędny nawias z końca linijki)
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
@@ -129,28 +128,34 @@ async function register(){
         return;
     }
 
-    const {error}=await client.from("users").insert([{
+    // NAPRAWIONE: Dodano .select(), aby baza od razu zwróciła wygenerowane ID użytkownika
+    const {data, error}=await client.from("users").insert([{
         username,
         password,
         streak:0,
         best_streak:0,
         total_days:0,
         dres:""
-    }]);
+    }]).select();
 
     if(error){
-        alert(error.message);
+        alert("Błąd bazy (Sprawdź RLS): " + error.message);
         console.log(error);
         return;
     }
 
-    alert("Konto stworzone, GRATULACJE!");
+    alert("Konto stworzone, GRATULACJE! Możesz się teraz zalogować.");
 }
 
 /* ===== LOGIN ===== */
 async function login(){
     const username=document.getElementById("username").value.trim();
     const password=document.getElementById("password").value.trim();
+
+    if(!username || !password){
+        alert("Wpisz login i hasło");
+        return;
+    }
 
     const {data,error}=await client
     .from("users")
@@ -177,6 +182,7 @@ if(!data){
 
 /* ===== UI ===== */
 function updateUI(){
+    if(!currentUser) return;
     document.getElementById("output").innerHTML=`
         👤 Nazwa użytkownika:  ${currentUser.username}<br>
         🔥 Passa: ${currentUser.streak || 0}<br>
@@ -188,6 +194,7 @@ function updateUI(){
 
 /* ===== LOSOWANIE ===== */
 function losujDres(){
+    if(!currentUser) return;
     let i=0;
 
     const interval=setInterval(()=>{
@@ -202,10 +209,14 @@ function losujDres(){
         const chosen=dresy[Math.floor(Math.random()*dresy.length)];
         currentUser.dres=chosen;
 
-        await client
+        const {error} = await client
         .from("users")
         .update({dres:chosen})
-        .eq("id",currentUser.id);
+        .eq("username",currentUser.username); // Zmieniono warunek na unikalny username
+
+        if(error){
+            alert("Błąd zapisu dresu: " + error.message);
+        }
 
         updateUI();
     },4000);
@@ -213,8 +224,9 @@ function losujDres(){
 
 /* ===== STREAK ===== */
 async function bylemWDresach(){
-    // NAPRAWIONE: Zmieniono .split("T") na .split("T")[0], aby poprawnie wyciągać datę tekstową
-    const today=new Date().toISOString().split("T")[0];
+    if(!currentUser) return;
+    
+    const today = new Date().toISOString().split("T")[0];
 
     if(currentUser.last_click===today){
         alert("Dzisiaj już kliknięte");
@@ -240,12 +252,16 @@ async function bylemWDresach(){
     currentUser.total_days=(currentUser.total_days || 0)+1;
     currentUser.last_click=today;
 
-    await client.from("users").update({
+    const {error} = await client.from("users").update({
         streak,
         best_streak:best,
         total_days:currentUser.total_days,
         last_click:today
-    }).eq("id",currentUser.id);
+    }).eq("username",currentUser.username); // Zmieniono warunek na unikalny username
+
+    if(error){
+        alert("Błąd zapisu passy: " + error.message);
+    }
 
     updateUI();
 }
@@ -275,7 +291,7 @@ function polecane(){
 
 /* ===== DISCORD ===== */
 function discord(){
-    window.location="https://discord.com";
+    window.open("https://discord.com", "_blank");
 }
 
 /* ===== TOP ===== */
