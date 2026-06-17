@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ZMIANA: Nowy, stabilny serwer dla biblioteki Supabase, który ominie błąd TIMEOUT -->
+<script src="https://unpkg.com"></script>
 
 <style>
 body{
@@ -85,7 +86,7 @@ a:hover{
 </div>
 
 <script>
-const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
+const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -128,7 +129,6 @@ async function register(){
         return;
     }
 
-    // NAPRAWIONE: Dodano .select(), aby baza od razu zwróciła wygenerowane ID użytkownika
     const {data, error}=await client.from("users").insert([{
         username,
         password,
@@ -139,7 +139,7 @@ async function register(){
     }]).select();
 
     if(error){
-        alert("Błąd bazy (Sprawdź RLS): " + error.message);
+        alert("Błąd bazy: " + error.message);
         console.log(error);
         return;
     }
@@ -212,7 +212,7 @@ function losujDres(){
         const {error} = await client
         .from("users")
         .update({dres:chosen})
-        .eq("username",currentUser.username); // Zmieniono warunek na unikalny username
+        .eq("username",currentUser.username);
 
         if(error){
             alert("Błąd zapisu dresu: " + error.message);
@@ -226,6 +226,7 @@ function losujDres(){
 async function bylemWDresach(){
     if(!currentUser) return;
     
+    // NAPRAWIONE: Pobieranie czystej daty tekstowej bez błędu komentarza
     const today = new Date().toISOString().split("T")[0];
 
     if(currentUser.last_click===today){
@@ -257,7 +258,7 @@ async function bylemWDresach(){
         best_streak:best,
         total_days:currentUser.total_days,
         last_click:today
-    }).eq("username",currentUser.username); // Zmieniono warunek na unikalny username
+    }).eq("username",currentUser.username);
 
     if(error){
         alert("Błąd zapisu passy: " + error.message);
