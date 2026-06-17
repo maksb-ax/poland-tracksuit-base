@@ -171,11 +171,11 @@ async function login(){
 /* ===== UI ===== */
 function updateUI(){
     document.getElementById("output").innerHTML=`
-        👤 ${currentUser.username}<br>
-        🔥 Passa: ${currentUser.streak || 0}<br>
-        🏆 Best: ${currentUser.best_streak || 0}<br>
-        📅 Total: ${currentUser.total_days || 0}<br>
-        👕 Dresy: ${currentUser.dres || "brak"}
+        👤 Nazwa użytkownika: ${currentUser.username}<br>
+        🔥 Passa w dresach: ${currentUser.streak || 0}<br>
+        🏆 Największa passa: ${currentUser.best_streak || 0}<br>
+        📅 Ogółem dresy miał*m na sobie: ${currentUser.total_days || 0} razy<br>
+        👕 Dresy na dziś: ${currentUser.dres || "brak"}
     `;
 }
 
@@ -187,7 +187,7 @@ function losujDres(){
         document.getElementById("output").innerHTML=
         "🎡 Losowanie... " + dresy[i % dresy.length];
         i++;
-    },200);
+    },150);
 
     setTimeout(async ()=>{
         clearInterval(interval);
@@ -255,7 +255,7 @@ function polecane(){
     produkty.forEach(p => {
         html += `
             <div style="margin:10px 0;">
-                <a href="${p.url}" target="_blank">
+                <a href="#" onclick="window.open('${p.url}', '_blank'); return false;">
                     👕 ${p.name}
                 </a>
             </div>
