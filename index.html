@@ -1,183 +1,152 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  body {
-    background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    font-family: Arial, sans-serif;
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('tlo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #111;
     color: white;
-  }
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-align: center;
+    padding: 30px;
+    margin: 0;
+}
 
-  /* Neonowy nagłówek */
-  h1 {
+h1 {
     font-size: 2.5rem;
     text-transform: uppercase;
     color: #fff;
     text-shadow: 0 0 5px #fff, 0 0 10px #2F2F4F, 0 0 20px #7ab7ff, 0 0 40px #7ab7ff;
     margin-bottom: 30px;
-  }
-  h1 span {
-    color: #ff69b4;
-    text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4, 0 0 40px #ff69b4;
-  }
+}
 
-  /* Ekrany */
-  .screen { display: none; opacity: 0; transition: opacity 0.45s ease; }
-  .active { display: flex; flex-direction: column; align-items: center; opacity: 1; }
-
-  /* Panel logowania */
-  #auth.active {
+.screen {
+    display: none;
+    max-width: 400px;
+    margin: 0 auto;
     background: rgba(47, 47, 79, 0.4);
-    padding: 40px;
+    padding: 25px;
     border-radius: 20px;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    width: 350px;
-  }
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+    border: 1px solid rgba(255,255,255,0.1);
+}
 
-  /* Inputy */
-  input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    padding: 14px;
-    margin-top: 10px;
-    text-align: center;
-    outline: none;
-  }
-  input::placeholder { color: rgba(255,255,255,0.6); }
+.active { display: block; }
 
-  /* Przyciski */
-  button {
+input, button {
+    display: block;
+    margin: 15px auto;
+    padding: 15px;
     width: 100%;
-    background: linear-gradient(135deg, #2F2F4F, #1a1a3a);
-    color: white;
-    font-weight: bold;
     border-radius: 12px;
     border: none;
-    padding: 14px;
-    margin-top: 10px;
-    box-shadow: 0 0 10px rgba(122, 183, 255, 0.18);
-    transition: all 0.25s ease;
-    cursor: pointer;
-  }
-  button:hover {
-    background: linear-gradient(135deg, #3a3a63, #22224d);
-    box-shadow: 0 0 20px rgba(122, 183, 255, 0.45);
-    transform: translateY(-2px);
-  }
+    font-size: 1rem;
+}
 
-  /* Output area */
-  #output {
-    margin-top: 18px;
-    padding: 12px;
-    width: 100%;
+input {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
     text-align: center;
-    color: #e6eefc;
-  }
+}
 
-  /* Loader */
-  #loading.active {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  .loader {
-    border: 6px solid rgba(255, 255, 255, 0.12);
-    border-top: 6px solid #7ab7ff;
-    border-radius: 50%;
-    width: 64px;
-    height: 64px;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+button {
+    background: linear-gradient(135deg, #2F2F4F, #1a1a3a);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border: 1px solid rgba(122,183,255,0.3);
+}
 
-  /* Top list */
-  #topList { text-align: left; width: 320px; color: #dfefff; }
+button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #3a3a63, #22224d);
+}
 
-  /* App container style */
-  #app.active {
-    background: rgba(20,20,30,0.2);
-    padding: 24px;
-    border-radius: 16px;
-    width: 360px;
-    align-items: stretch;
-  }
+.profile-stats {
+    text-align: left;
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    border-left: 4px solid #7ab7ff;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+a {
+    color: #7ab7ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+a:hover {
+    color: white;
+}
 </style>
 </head>
 
 <body>
-  <h1>PEOPLE WHO <span>LOVE</span> WEAR TRACKSUIT</h1>
 
-  <div id="auth" class="screen active">
-    <input id="username" placeholder="Username" />
-    <input id="password" type="password" placeholder="Password" />
-    <button id="loginBtn">Zaloguj</button>
-    <button id="registerBtn">Stwórz konto</button>
-  </div>
+<h1>People who LOVE WEAR tracksuit</h1>
 
-  <div id="loading" class="screen">
-    <div class="loader"></div>
-  </div>
+<div id="auth" class="screen active">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Zaloguj</button>
+    <button onclick="register()">Stwórz konto</button>
+</div>
 
-  <div id="menu" class="screen">
-    <button id="goApp">Wchodzę na stronę</button>
-    <button id="goTop">Lista TOP</button>
-  </div>
+<div id="menu" class="screen">
+    <button onclick="showScreen('app')">Wchodzę na stronę</button>
+    <button onclick="showTop()">Lista TOP</button>
+</div>
 
-  <div id="top" class="screen">
+<div id="top" class="screen">
     <h2>TOP Ranking</h2>
     <div id="topList"></div>
-    <button id="backMenu">Powrót</button>
-  </div>
+    <button onclick="showScreen('menu')">Powrót</button>
+</div>
 
-  <div id="app" class="screen">
-    <button id="losujBtn">1. Wylosuj dres</button>
-    <button id="streakBtn">2. Byłem dziś w dresach</button>
-    <button id="styleBtn">3. Jak nosić dresy</button>
-    <button id="polecaneBtn">4. Polecane dresy</button>
-    <button id="discordBtn">5. Discord</button>
-    <button id="menuBtn">Menu</button>
+<div id="app" class="screen">
+    <button onclick="losujDres()">1. Wylosuj dres</button>
+    <button onclick="bylemWDresach()">2. Byłem dziś w dresach</button>
+    <button onclick="jakNosic()">3. Jak nosić dresy</button>
+    <button onclick="polecane()">4. Polecane dresy</button>
+    <button onclick="discord()">5. Discord</button>
+    <button onclick="showScreen('menu')">Menu</button>
+
     <div id="output"></div>
-  </div>
+</div>
 
 <script>
-/* ===== Supabase client ===== */
-const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ===== SUPABASE ===== */
+const client = supabase.createClient(
+    "https://aimyhgkpjtjjityrsmai.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY"
+);
 
 let currentUser = null;
 
-/* ===== DRESY ===== */
+/* ===== LISTY ===== */
 const dresy = [
-  "Nike Tech Fleece",
-  "Cusbclo Czarne",
-  "Cusbclo Szare",
-  "Cusbclo Granatowe",
-  "Cusbclo Zielone",
-  "Cusbclo Rich Red"
+    "Nike Tech Fleece",
+    "Cusbclo Czarne",
+    "Cusbclo Szare",
+    "Cusbclo Granatowe",
+    "Cusbclo Zielone",
+    "Cusbclo Rich Red"
 ];
 
-/* ===== PRODUKTY (KLIKALNE) ===== */
 const produkty = [
   { name: "Nike Tech Fleece", url: "https://www.nike.com/pl/" },
   { name: "Cusbclo - Czarne", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-schwarz" },
@@ -187,242 +156,170 @@ const produkty = [
   { name: "Cusbclo - Rich red", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red" }
 ];
 
-/* ===== SCREEN SYSTEM ===== */
+/* ===== EKRANY ===== */
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  const el = document.getElementById(id);
-  if(el) el.classList.add("active");
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 }
 
-/* ===== REGISTER ===== */
+/* ===== REJESTRACJA ===== */
 async function register(){
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if(!username || !password){
-    alert("Wpisz login i hasło");
-    return;
-  }
-
-  const { error } = await client.from("users").insert([{
-    username,
-    password,
-    streak: 0,
-    best_streak: 0,
-    total_days: 0,
-    dres: "",
-    last_click: null
-  }]);
-
-  if(error){
-    alert("Błąd tworzenia konta: " + error.message);
-    console.error(error);
-    return;
-  }
-
-  alert("Konto stworzone, GRATULACJE!");
-}
-
-/* ===== LOGIN ===== */
-async function login(){
-  showScreen("loading");
-
-  // symulacja ładowania (animacja)
-  setTimeout(async () => {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
 
     if(!username || !password){
-      alert("Wpisz login i hasło");
-      showScreen("auth");
-      return;
+        alert("Wpisz login i hasło");
+        return;
     }
 
-    const { data, error } = await client
-      .from("users")
-      .select("*")
-      .eq("username", username)
-      .eq("password", password)
-      .maybeSingle();
+    await client.from("users").insert([{
+        username,
+        password,
+        streak: 0,
+        best_streak: 0,
+        total_days: 0,
+        dres: "",
+        last_click: null
+    }]);
 
-    if(error){
-      alert("Błąd logowania: " + error.message);
-      console.error(error);
-      showScreen("auth");
-      return;
-    }
+    alert("Konto stworzone!");
+}
+
+/* ===== LOGOWANIE ===== */
+async function login(){
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    const { data } = await client
+        .from("users")
+        .select("*")
+        .eq("username", username)
+        .eq("password", password)
+        .maybeSingle();
 
     if(!data){
-      alert("Zły login lub hasło");
-      showScreen("auth");
-      return;
+        alert("Zły login lub hasło");
+        return;
     }
 
     currentUser = data;
     showScreen("menu");
-    updateUI();
-  }, 1400);
 }
 
 /* ===== UI ===== */
 function updateUI(){
-  const out = document.getElementById("output");
-  if(!currentUser){
-    out.innerHTML = "";
-    return;
-  }
-  out.innerHTML = `
-    👤 <strong>Nazwa użytkownika:</strong> ${escapeHtml(currentUser.username)}<br>
-    🔥 <strong>Passa:</strong> ${currentUser.streak || 0}<br>
-    🏆 <strong>Best passa:</strong> ${currentUser.best_streak || 0}<br>
-    📅 <strong>Ogółem w dresach był*m:</strong> ${currentUser.total_days || 0} razy<br>
-    👕 <strong>Dresy na dziś:</strong> ${escapeHtml(currentUser.dres || "brak")}
-  `;
+    output.innerHTML = `
+        <div class="profile-stats">
+            👤 <b>Użytkownik:</b> ${currentUser.username}<br>
+            🔥 <b>Passa:</b> ${currentUser.streak}<br>
+            🏆 <b>Najlepsza passa:</b> ${currentUser.best_streak}<br>
+            📅 <b>Dni w dresach:</b> ${currentUser.total_days}<br>
+            👕 <b>Dres na dziś:</b> ${currentUser.dres || "brak"}
+        </div>
+    `;
 }
 
 /* ===== LOSOWANIE ===== */
 function losujDres(){
-  if(!currentUser){ alert("Zaloguj się najpierw"); return; }
+    let i = 0;
 
-  let i = 0;
-  const output = document.getElementById("output");
+    const interval = setInterval(() => {
+        output.innerHTML = `<div class="profile-stats" style="text-align:center;">
+            🎡 Losowanie... <br><b>${dresy[i % dresy.length]}</b>
+        </div>`;
+        i++;
+    }, 150);
 
-  const interval = setInterval(() => {
-    output.innerHTML = "🎡 Losowanie... " + dresy[i % dresy.length];
-    i++;
-  }, 120);
+    setTimeout(async () => {
+        clearInterval(interval);
 
-  setTimeout(async () => {
-    clearInterval(interval);
-    const chosen = dresy[Math.floor(Math.random() * dresy.length)];
-    currentUser.dres = chosen;
+        const chosen = dresy[Math.floor(Math.random() * dresy.length)];
+        currentUser.dres = chosen;
 
-    const { error } = await client
-      .from("users")
-      .update({ dres: chosen })
-      .eq("id", currentUser.id);
+        await client.from("users")
+            .update({ dres: chosen })
+            .eq("id", currentUser.id);
 
-    if(error) console.error("Błąd update dres:", error);
-    updateUI();
-  }, 2600);
+        updateUI();
+    }, 2500);
 }
 
-/* ===== STREAK ===== */
+/* ===== BYŁEM W DRESACH ===== */
 async function bylemWDresach(){
-  if(!currentUser){ alert("Zaloguj się najpierw"); return; }
+    const today = new Date().toISOString().split("T")[0];
 
-  const today = new Date().toISOString().split("T")[0];
-
-  if(currentUser.last_click === today){
-    alert("Dzisiaj już kliknięte");
-    return;
-  }
-
-  let streak = 1;
-  if(currentUser.last_click){
-    const last = new Date(currentUser.last_click);
-    const now = new Date(today);
-    const diff = Math.round((now - last) / (1000 * 60 * 60 * 24));
-    if(diff === 1){
-      streak = (currentUser.streak || 0) + 1;
+    if(currentUser.last_click === today){
+        alert("Już dziś kliknąłeś!");
+        return;
     }
-  }
 
-  const best = Math.max(streak, currentUser.best_streak || 0);
-  currentUser.streak = streak;
-  currentUser.best_streak = best;
-  currentUser.total_days = (currentUser.total_days || 0) + 1;
-  currentUser.last_click = today;
+    let streak = 1;
 
-  const { error } = await client.from("users").update({
-    streak,
-    best_streak: best,
-    total_days: currentUser.total_days,
-    last_click: today
-  }).eq("id", currentUser.id);
+    if(currentUser.last_click){
+        const diff = (new Date(today) - new Date(currentUser.last_click)) / (1000*60*60*24);
+        if(diff === 1){
+            streak = currentUser.streak + 1;
+        }
+    }
 
-  if(error){
-    console.error("Błąd update passa:", error);
-    alert("Błąd zapisu passa: " + error.message);
-    return;
-  }
+    const best = Math.max(streak, currentUser.best_streak);
 
-  updateUI();
+    currentUser.streak = streak;
+    currentUser.best_streak = best;
+    currentUser.total_days++;
+    currentUser.last_click = today;
+
+    await client.from("users").update({
+        streak,
+        best_streak: best,
+        total_days: currentUser.total_days,
+        last_click: today
+    }).eq("id", currentUser.id);
+
+    updateUI();
 }
 
-/* ===== INFO ===== */
-function jakNosic(){
-  document.getElementById("output").innerHTML = "👕 Czarne dresy + sneakersy + hoodie = top styl";
-}
-
-/* ===== KLIKALNE POLECANE ===== */
+/* ===== POLECANE ===== */
 function polecane(){
-  let html = "<h3 style='margin-bottom:8px'>Polecane dresy</h3>";
-  produkty.forEach(p => {
-    html += `<div style="margin:8px 0;"><a href="${p.url}" target="_blank" rel="noopener" style="color:#7ab7ff;text-decoration:none">👕 ${escapeHtml(p.name)}</a></div>`;
-  });
-  document.getElementById("output").innerHTML = html;
+    let html = `<div class="profile-stats" style="text-align:center;">
+        <h3>Polecane dresy</h3>`;
+
+    produkty.forEach(p => {
+        html += `<div style="margin:10px 0;">
+            <a href="${p.url}" target="_blank">👕 ${p.name}</a>
+        </div>`;
+    });
+
+    html += "</div>";
+
+    output.innerHTML = html;
+}
+
+/* ===== TOP LISTA ===== */
+async function showTop(){
+    const { data } = await client
+        .from("users")
+        .select("*")
+        .order("best_streak", { ascending: false })
+        .limit(10);
+
+    let html = `<div class="profile-stats"><h3>TOP PASSA</h3>`;
+
+    data.forEach((u, i) => {
+        html += `${i+1}. <b>${u.username}</b> — ${u.best_streak}<br>`;
+    });
+
+    html += "</div>";
+
+    topList.innerHTML = html;
+    showScreen("top");
 }
 
 /* ===== DISCORD ===== */
 function discord(){
-  window.open("https://discord.com/", "_blank", "noopener");
+    window.open("https://discord.com", "_blank");
 }
-
-/* ===== TOP ===== */
-async function showTop(){
-  showScreen("loading");
-  setTimeout(async () => {
-    const { data, error } = await client
-      .from("users")
-      .select("username,best_streak")
-      .order("best_streak", { ascending: false })
-      .limit(10);
-
-    if(error){
-      alert("Błąd pobierania TOP: " + error.message);
-      console.error(error);
-      showScreen("menu");
-      return;
-    }
-
-    let html = "<ol style='padding-left:18px;margin:8px 0'>";
-    data.forEach(u => {
-      html += `<li style="margin:6px 0">${escapeHtml(u.username)} - ${u.best_streak || 0}</li>`;
-    });
-    html += "</ol>";
-
-    document.getElementById("topList").innerHTML = html;
-    showScreen("top");
-  }, 700);
-}
-
-/* ===== UTILS ===== */
-function escapeHtml(str){
-  if(!str && str !== 0) return "";
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-/* ===== EVENTY (przypisane w JS, nie onclick w HTML) ===== */
-document.getElementById("loginBtn").addEventListener("click", login);
-document.getElementById("registerBtn").addEventListener("click", register);
-document.getElementById("goApp").addEventListener("click", () => showScreen("app"));
-document.getElementById("goTop").addEventListener("click", showTop);
-document.getElementById("backMenu").addEventListener("click", () => showScreen("menu"));
-document.getElementById("losujBtn").addEventListener("click", losujDres);
-document.getElementById("streakBtn").addEventListener("click", bylemWDresach);
-document.getElementById("styleBtn").addEventListener("click", jakNosic);
-document.getElementById("polecaneBtn").addEventListener("click", polecane);
-document.getElementById("discordBtn").addEventListener("click", discord);
-document.getElementById("menuBtn").addEventListener("click", () => showScreen("menu"));
-
-/* Opcjonalnie: pokaż auth przy starcie */
-showScreen("auth");
 </script>
+
 </body>
 </html>
