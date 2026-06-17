@@ -43,8 +43,10 @@ a{
     color:#7ab7ff;
     text-decoration:none;
 }
+
 a:hover{
     color:white;
+    text-decoration:underline;
 }
 </style>
 </head>
@@ -83,10 +85,8 @@ a:hover{
 </div>
 
 <script>
-
-/* 🔥 TWÓJ SUPABASE */
 const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
+const SUPABASE_KEY = "TWÓJ_KLUCZ_SUPABASE";
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -102,17 +102,17 @@ const dresy = [
 "Cusbclo Rich Red"
 ];
 
-/* ===== LINKI ===== */
+/* ===== PRODUKTY (KLIKALNE) ===== */
 const produkty = [
-  { name:"Nike Tech Fleece", url:"https://www.nike.com/pl/" },
-  { name:"Cusbclo Czarne", url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-schwarz" },
-  { name:"Cusbclo Szare", url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-anthrazit" },
-  { name:"Cusbclo Granatowe", url:"https://www.cusbclo.com/collections/tracksuits-2025/products/navy-jogger" },
-  { name:"Cusbclo Zielone", url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-bronze-green" },
-  { name:"Cusbclo Rich Red", url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red" }
+  { name: "Nike Tech Fleece", url: "https://www.nike.com/pl/" },
+  { name: "Cusbclo - Czarne", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-schwarz" },
+  { name: "Cusbclo - Szare grafitowe", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-anthrazit" },
+  { name: "Cusbclo - Granatowe", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/navy-jogger" },
+  { name: "Cusbclo - Zielone", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-bronze-green" },
+  { name: "Cusbclo - Rich red", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red" }
 ];
 
-/* ===== SCREEN ===== */
+/* ===== SCREEN SYSTEM ===== */
 function showScreen(id){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
@@ -120,12 +120,17 @@ function showScreen(id){
 
 /* ===== REGISTER ===== */
 async function register(){
-    const u = username.value.trim();
-    const p = password.value.trim();
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value.trim();
 
-    const { error } = await client.from("users").insert([{
-        username:u,
-        password:p,
+    if(!username || !password){
+        alert("Wpisz login i hasło");
+        return;
+    }
+
+    const {error}=await client.from("users").insert([{
+        username,
+        password,
         streak:0,
         best_streak:0,
         total_days:0,
@@ -134,6 +139,7 @@ async function register(){
 
     if(error){
         alert(error.message);
+        console.log(error);
         return;
     }
 
@@ -142,119 +148,121 @@ async function register(){
 
 /* ===== LOGIN ===== */
 async function login(){
-    const u = username.value.trim();
-    const p = password.value.trim();
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value.trim();
 
-    const { data, error } = await client
-        .from("users")
-        .select("*")
-        .eq("username", u)
-        .eq("password", p)
-        .maybeSingle();
+    const {data,error}=await client
+    .from("users")
+    .select("*")
+    .eq("username",username)
+    .eq("password",password)
+    .single();
 
     if(error || !data){
         alert("Zły login lub hasło");
         return;
     }
 
-    currentUser = data;
+    currentUser=data;
     showScreen("menu");
     updateUI();
 }
 
 /* ===== UI ===== */
 function updateUI(){
-    if(!currentUser) return;
-
-    document.getElementById("output").innerHTML = `
+    document.getElementById("output").innerHTML=`
         👤 ${currentUser.username}<br>
-        🔥 Passa: ${currentUser.streak}<br>
-        🏆 Best: ${currentUser.best_streak}<br>
-        📅 Total: ${currentUser.total_days}<br>
-        👕 Dres: ${currentUser.dres || "brak"}
+        🔥 Passa: ${currentUser.streak || 0}<br>
+        🏆 Best: ${currentUser.best_streak || 0}<br>
+        📅 Total: ${currentUser.total_days || 0}<br>
+        👕 Dresy: ${currentUser.dres || "brak"}
     `;
 }
 
 /* ===== LOSOWANIE ===== */
 function losujDres(){
-    let i = 0;
+    let i=0;
 
-    const interval = setInterval(()=>{
-        document.getElementById("output").innerHTML =
+    const interval=setInterval(()=>{
+        document.getElementById("output").innerHTML=
         "🎡 Losowanie... " + dresy[i % dresy.length];
         i++;
-    },150);
+    },200);
 
     setTimeout(async ()=>{
         clearInterval(interval);
 
-        const chosen = dresy[Math.floor(Math.random()*dresy.length)];
-        currentUser.dres = chosen;
+        const chosen=dresy[Math.floor(Math.random()*dresy.length)];
+        currentUser.dres=chosen;
 
-        await client.from("users")
-        .update({ dres: chosen })
-        .eq("id", currentUser.id);
+        await client
+        .from("users")
+        .update({dres:chosen})
+        .eq("id",currentUser.id);
 
         updateUI();
-    },3000);
+    },4000);
 }
 
 /* ===== STREAK ===== */
 async function bylemWDresach(){
-    const today = new Date().toISOString().split("T")[0];
+    const today=new Date().toISOString().split("T")[0];
 
-    if(currentUser.last_click === today){
+    if(currentUser.last_click===today){
         alert("Dzisiaj już kliknięte");
         return;
     }
 
-    let streak = 1;
+    let streak=1;
 
     if(currentUser.last_click){
-        let last = new Date(currentUser.last_click);
-        let now = new Date(today);
-        let diff = (now-last)/(1000*60*60*24);
+        let last=new Date(currentUser.last_click);
+        let now=new Date(today);
+        let diff=(now-last)/(1000*60*60*24);
 
-        if(diff === 1) streak = currentUser.streak + 1;
+        if(diff===1){
+            streak=currentUser.streak+1;
+        }
     }
 
-    let best = Math.max(streak, currentUser.best_streak || 0);
+    let best=Math.max(streak,currentUser.best_streak || 0);
+
+    currentUser.streak=streak;
+    currentUser.best_streak=best;
+    currentUser.total_days=(currentUser.total_days || 0)+1;
+    currentUser.last_click=today;
 
     await client.from("users").update({
         streak,
         best_streak:best,
-        total_days:(currentUser.total_days||0)+1,
+        total_days:currentUser.total_days,
         last_click:today
-    }).eq("id", currentUser.id);
-
-    currentUser.streak = streak;
-    currentUser.best_streak = best;
-    currentUser.total_days = (currentUser.total_days||0)+1;
-    currentUser.last_click = today;
+    }).eq("id",currentUser.id);
 
     updateUI();
 }
 
-/* ===== POLECANE (DZIAŁA) ===== */
+/* ===== INFO ===== */
+function jakNosic(){
+    document.getElementById("output").innerHTML=
+    "👕 Czarne dresy + sneakersy + hoodie = top styl";
+}
+
+/* ===== KLIKALNE POLECANE ===== */
 function polecane(){
     let html = "<h3>Polecane dresy</h3>";
 
-    produkty.forEach(p=>{
+    produkty.forEach(p => {
         html += `
-        <div style="margin:10px 0;">
-            <button onclick="window.open('${p.url}','_blank')" style="width:320px;">
-                👕 ${p.name}
-            </button>
-        </div>`;
+            <div style="margin:10px 0;">
+                <a href="${p.url}" target="_blank">
+                    👕 ${p.name}
+                </a>
+            </div>
+        `;
     });
 
     document.getElementById("output").innerHTML = html;
-}
-
-/* ===== INFO ===== */
-function jakNosic(){
-    document.getElementById("output").innerHTML =
-    "👕 Dres + sneakers + hoodie = top styl";
 }
 
 /* ===== DISCORD ===== */
@@ -264,22 +272,26 @@ function discord(){
 
 /* ===== TOP ===== */
 async function showTop(){
-    const { data } = await client
-        .from("users")
-        .select("*")
-        .order("best_streak",{ascending:false})
-        .limit(10);
+    const {data,error}=await client
+    .from("users")
+    .select("*")
+    .order("best_streak",{ascending:false})
+    .limit(10);
 
-    let html = "<h3>TOP PASSA</h3>";
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    let html="<h3>TOP PASSA</h3>";
 
     data.forEach((u,i)=>{
-        html += `${i+1}. ${u.username} - ${u.best_streak}<br>`;
+        html += `${i+1}. ${u.username} - ${u.best_streak || 0}<br>`;
     });
 
-    document.getElementById("topList").innerHTML = html;
+    document.getElementById("topList").innerHTML=html;
     showScreen("top");
 }
-
 </script>
 
 </body>
