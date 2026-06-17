@@ -56,10 +56,10 @@ a:hover{
 
 <h1>People who LOVE WEAR tracksuit</h1>
 
-<!-- Uproszczony ekran wejścia: Tylko Nick -->
+<!-- Ekran wejścia z jednym przyciskiem wywołującym poprawną funkcję -->
 <div id="auth" class="screen active">
     <input id="username" placeholder="Wpisz swój unikalny nick">
-    <button onclick="wjedzNaStrone()">Wejdź na stronę</button>
+    <button onclick="wjedzNaStrone()">Wejdź na stronę / Stwórz konto</button>
 </div>
 
 <div id="menu" class="screen">
@@ -86,7 +86,7 @@ a:hover{
 </div>
 
 <script>
-// Konfiguracja Twojej bazy danych Supabase
+// Konfiguracja bazy danych Supabase
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
@@ -120,7 +120,7 @@ function showScreen(id){
     document.getElementById(id).classList.add("active");
 }
 
-/* ===== LOGOWANIE ORAZ AUTOMATYCZNA REJESTRACJA ===== */
+/* ===== WEJŚCIE NA STRONĘ (LOGOWANIE / REJESTRACJA) ===== */
 async function wjedzNaStrone(){
     const username = document.getElementById("username").value.trim();
 
@@ -129,7 +129,7 @@ async function wjedzNaStrone(){
         return;
     }
 
-    // 1. Sprawdzamy, czy użytkownik już istnieje w bazie danych
+    // Szukanie użytkownika w bazie
     const { data, error } = await client
         .from("users")
         .select("*")
@@ -142,17 +142,16 @@ async function wjedzNaStrone(){
     }
 
     if(data) {
-        // Użytkownik istnieje - logujemy go bezpośrednio
         currentUser = data;
         showScreen("menu");
         updateUI();
     } else {
-        // Użytkownik nie istnieje - automatycznie zakładamy mu konto
+        // Automatyczne dodanie nowego profilu, gdy nicku nie ma w bazie
         const { data: newUser, error: insertError } = await client
             .from("users")
             .insert([{
                 username: username,
-                password: "brak-hasla-otwarta-strona", // pole hasła zostaje uproszczone
+                password: "brak-hasla-otwarta-strona",
                 streak: 0,
                 best_streak: 0,
                 total_days: 0,
@@ -162,13 +161,13 @@ async function wjedzNaStrone(){
             .single();
 
         if(insertError){
-            alert("Nie udało się stworzyć nowego profilu. Sprawdź opcje RLS w Supabase.");
+            alert("Błąd zapisu nowego konta. Sprawdź, czy RLS w Supabase jest wyłączone!");
             console.log(insertError);
             return;
         }
 
         currentUser = newUser;
-        alert("Witaj nowy dresiarzu! Twoje konto zostało utworzone automatycznie.");
+        alert("Witaj! Twój profil dresiarza został pomyślnie utworzony.");
         showScreen("menu");
         updateUI();
     }
@@ -216,18 +215,18 @@ function losujDres(){
             .eq("id", currentUser.id);
 
         if(error) {
-            alert("Błąd zapisu dresu.");
+            alert("Nie udało się zapisać dresu w bazie danych.");
         }
 
         updateUI();
-    }, 2000); // Skróciłem losowanie do 2 sekund, żeby było dynamiczniej
+    }, 2000);
 }
 
 /* ===== STREAK (PASSA) ===== */
 async function bylemWDresach(){
     if(!currentUser) return;
     
-    // NAPRAWIONE: Pobieranie czystego ciągu znaków RRRR-MM-DD
+    // Pobranie poprawnego tekstu daty formatu RRRR-MM-DD
     const today = new Date().toISOString().split("T")[0];
 
     if(currentUser.last_click === today){
@@ -265,7 +264,7 @@ async function bylemWDresach(){
         .eq("id", currentUser.id);
 
     if(error) {
-        alert("Nie udało się zaktualizować passy.");
+        alert("Błąd aktualizacji passy w bazie.");
     }
 
     updateUI();
