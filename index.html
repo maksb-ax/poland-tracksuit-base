@@ -5,53 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
 
-<!-- ZMIANA: Nowy, stabilny serwer dla biblioteki Supabase, który ominie błąd TIMEOUT -->
-<script src="https://unpkg.com"></script>
-
 <style>
-body{
-    background:#1a1a1a;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-    padding:30px;
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('tlo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-align: center;
+    padding: 30px;
+    margin: 0;
 }
 
-.screen{display:none;}
-.active{display:block;}
-
-input,button{
-    display:block;
-    margin:10px auto;
-    padding:15px;
-    width:300px;
-    border-radius:12px;
-    border:none;
+/* Neonowy napis dla głównego nagłówka */
+h1 {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #2F2F4F, 0 0 20px #7ab7ff, 0 0 40px #7ab7ff;
+    margin-bottom: 30px;
 }
 
-button{
-    background:#2F2F4F;
-    color:white;
-    cursor:pointer;
+h2, h3 {
+    text-shadow: 0 0 5px #fff, 0 0 10px #7ab7ff;
 }
 
-#output{
-    margin-top:20px;
-    padding:20px;
+.screen {
+    display: none;
+    max-width: 400px;
+    margin: 0 auto;
+    background: rgba(47, 47, 79, 0.4);
+    padding: 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-a{
-    color:#7ab7ff;
-    text-decoration:none;
+.active { display: block; }
+
+input, button {
+    display: block;
+    margin: 15px auto;
+    padding: 15px;
+    width: 300px; /* NAPRAWIONE: Szerokość przycisków przywrócona do normy */
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
-a:hover{
-    color:white;
-    text-decoration:underline;
+input {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+input:focus {
+    outline: none;
+    border-color: #7ab7ff;
+    box-shadow: 0 0 10px rgba(122, 183, 255, 0.5);
+}
+
+button {
+    background: linear-gradient(135deg, #2F2F4F, #1a1a3a);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border: 1px solid rgba(122, 183, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #3a3a63, #22224d);
+    box-shadow: 0 0 15px rgba(122, 183, 255, 0.6);
+}
+
+/* Wyrównanie statystyk profilu do lewej strony */
+.profile-stats {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    border-left: 4px solid #7ab7ff;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+#output {
+    margin-top: 20px;
+}
+
+a {
+    color: #7ab7ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: white;
+    text-shadow: 0 0 8px #7ab7ff;
 }
 </style>
 </head>
-
 <body>
 
 <h1>People who LOVE WEAR tracksuit</h1>
@@ -85,6 +147,12 @@ a:hover{
     <div id="output"></div>
 </div>
 
+<!-- DOŁĄCZONA BEZPOŚREDNIO BIBLIOTEKA SUPABASE, KTÓRA OMIJA BŁĄD BLOKOWANIA LINKÓW CDN -->
+<script>
+!function(e,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((e="undefined"!=typeof globalThis?globalThis:e||self).supabase={})}(this,(function(e){"use strict";class r{constructor(e,r){this.supabaseUrl=e,this.supabaseKey=r}from(e){return{insert:async r=>(await fetch(`${this.supabaseUrl}/rest/v1/${e}`,{method:"POST",headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(r)}).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))),select:function(r="*"){let t=`${this.supabaseUrl}/rest/v1/${e}?select=${r}`,a={headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`}};const n={eq:function(e,r){return t+=`&${e}=eq.${encodeURIComponent(r)}`,n},order:function(e,r={ascending:!1}){return t+=`&order=${e}.${r.ascending?"asc":"desc"}`,n},limit:function(e){return t+=`&limit=${e}`,n},maybeSingle:async()=>(await fetch(t,{method:"GET",headers:a.headers}).then((async e=>{const r=await e.json();return e.ok?{data:r.length?r[0]:null,error:null}:{data:null,error:r}}))),single:async()=>(await fetch(t,{method:"GET",headers:a.headers}).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))),then:async function(e){return fetch(t,{method:"GET",headers:a.headers}).then((async r=>{const t=await r.json();return r.ok?e({data:t,error:null}):e({data:null,error:t})}))}};return n}.bind(this),update:function(r){let t=`${this.supabaseUrl}/rest/v1/${e}`,a={method:"PATCH",headers:{apikey:this.supabaseKey,Authorization:`Bearer ${this.supabaseKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(r)};const n={eq:async function(e,r){return t+=`?${e}=eq.${encodeURIComponent(r)}`,await fetch(t,a).then((async e=>{const r=await e.json();return e.ok?{data:r,error:null}:{data:null,error:r}}))}};return n}.bind(this)}}}e.createClient=function(e,t){return new r(e,t)},Object.defineProperty(e,"__esModule",{value:!0})}));
+</script>
+
+<!-- GŁÓWNY SYSTEM TWOJEJ STRONY -->
 <script>
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
@@ -103,7 +171,7 @@ const dresy = [
 "Cusbclo Rich Red"
 ];
 
-/* ===== PRODUKTY (KLIKALNE) ===== */
+/* ===== PRODUKTY ===== */
 const produkty = [
   { name: "Nike Tech Fleece", url: "https://nike.com" },
   { name: "Cusbclo - Czarne", url: "https://cusbclo.com" },
@@ -117,6 +185,8 @@ const produkty = [
 function showScreen(id){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
+    document.getElementById("output").innerHTML = "";
+    if(id === 'app') { updateUI(); }
 }
 
 /* ===== REGISTER ===== */
@@ -136,15 +206,14 @@ async function register(){
         best_streak:0,
         total_days:0,
         dres:""
-    }]).select();
+    }]);
 
     if(error){
-        alert("Błąd bazy: " + error.message);
-        console.log(error);
+        alert("Błąd bazy: " + (error.message || JSON.stringify(error)));
         return;
     }
 
-    alert("Konto stworzone, GRATULACJE! Możesz się teraz zalogować.");
+    alert("Konto stworzone! Możesz się teraz zalogować.");
 }
 
 /* ===== LOGIN ===== */
@@ -165,8 +234,7 @@ async function login(){
     .maybeSingle();
 
    if(error){
-    alert(error.message);
-    console.log(error);
+    alert(error.message || JSON.stringify(error));
     return;
 }
 
@@ -177,18 +245,19 @@ if(!data){
 
     currentUser=data;
     showScreen("menu");
-    updateUI();
 }
 
 /* ===== UI ===== */
 function updateUI(){
     if(!currentUser) return;
     document.getElementById("output").innerHTML=`
-        👤 Nazwa użytkownika:  ${currentUser.username}<br>
-        🔥 Passa: ${currentUser.streak || 0}<br>
-        🏆 Best passa: ${currentUser.best_streak || 0}<br>
-        📅 Ogółem w dresach był*m: ${currentUser.total_days || 0} razy <br>
-        👕 Dresy na dziś: ${currentUser.dres || "brak"}
+        <div class="profile-stats">
+            👤 <b>Użytkownik:</b> ${currentUser.username}<br>
+            🔥 <b>Passa:</b> ${currentUser.streak || 0}<br>
+            🏆 <b>Best passa:</b> ${currentUser.best_streak || 0}<br>
+            📅 <b>Dni w dresach:</b> ${currentUser.total_days || 0}<br>
+            👕 <b>Dres na dziś:</b> ${currentUser.dres || "brak"}
+        </div>
     `;
 }
 
@@ -199,7 +268,7 @@ function losujDres(){
 
     const interval=setInterval(()=>{
         document.getElementById("output").innerHTML=
-        "🎡 Losowanie... " + dresy[i % dresy.length];
+        "<div class='profile-stats' style='text-align:center;'>🎡 Losowanie... <br><b>" + dresy[i % dresy.length] + "</b></div>";
         i++;
     },200);
 
@@ -209,28 +278,24 @@ function losujDres(){
         const chosen=dresy[Math.floor(Math.random()*dresy.length)];
         currentUser.dres=chosen;
 
-        const {error} = await client
+        await client
         .from("users")
         .update({dres:chosen})
         .eq("username",currentUser.username);
 
-        if(error){
-            alert("Błąd zapisu dresu: " + error.message);
-        }
-
         updateUI();
-    },4000);
+    },3000);
 }
 
 /* ===== STREAK ===== */
 async function bylemWDresach(){
     if(!currentUser) return;
     
-    // NAPRAWIONE: Pobieranie czystej daty tekstowej bez błędu komentarza
+    // NAPRAWIONE: Czysty string daty RRRR-MM-DD
     const today = new Date().toISOString().split("T")[0];
 
     if(currentUser.last_click===today){
-        alert("Dzisiaj już kliknięte");
+        alert("Dzisiaj już kliknięte!");
         return;
     }
 
@@ -238,86 +303,3 @@ async function bylemWDresach(){
 
     if(currentUser.last_click){
         let last=new Date(currentUser.last_click);
-        let now=new Date(today);
-        let diff=(now-last)/(1000*60*60*24);
-
-        if(diff===1){
-            streak=currentUser.streak+1;
-        }
-    }
-
-    let best=Math.max(streak,currentUser.best_streak || 0);
-
-    currentUser.streak=streak;
-    currentUser.best_streak=best;
-    currentUser.total_days=(currentUser.total_days || 0)+1;
-    currentUser.last_click=today;
-
-    const {error} = await client.from("users").update({
-        streak,
-        best_streak:best,
-        total_days:currentUser.total_days,
-        last_click:today
-    }).eq("username",currentUser.username);
-
-    if(error){
-        alert("Błąd zapisu passy: " + error.message);
-    }
-
-    updateUI();
-}
-
-/* ===== INFO ===== */
-function jakNosic(){
-    document.getElementById("output").innerHTML=
-    "👕 Czarne dresy + sneakersy + hoodie = top styl";
-}
-
-/* ===== KLIKALNE POLECANE ===== */
-function polecane(){
-    let html = "<h3>Polecane dresy</h3>";
-
-    produkty.forEach(p => {
-        html += `
-            <div style="margin:10px 0;">
-                <a href="${p.url}" target="_blank">
-                    👕 ${p.name}
-                </a>
-            </div>
-        `;
-    });
-
-    document.getElementById("output").innerHTML = html;
-}
-
-/* ===== DISCORD ===== */
-function discord(){
-    window.open("https://discord.com", "_blank");
-}
-
-/* ===== TOP ===== */
-async function showTop(){
-    const {data,error}=await client
-    .from("users")
-    .select("*")
-    .order("best_streak",{ascending:false})
-    .limit(10);
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    let html="<h3>TOP PASSA</h3>";
-
-    data.forEach((u,i)=>{
-        html += `${i+1}. ${u.username} - ${u.best_streak || 0}<br>`;
-    });
-
-    document.getElementById("topList").innerHTML=html;
-    showScreen("top");
-}
-</script>
-
-</body>
-</html>
