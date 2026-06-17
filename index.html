@@ -9,11 +9,12 @@
 
 <style>
 body {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('tlo.jpg');
+    background-image:
+        linear-gradient(to top, rgba(0, 20, 60, 0.9), rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.85)),
+        url('tlo.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    background-color: #111;
     color: white;
     font-family: 'Segoe UI', Arial, sans-serif;
     text-align: center;
@@ -21,28 +22,33 @@ body {
     margin: 0;
 }
 
+/* NEON LOVE */
 h1 {
     font-size: 2.5rem;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #2F2F4F, 0 0 20px #7ab7ff, 0 0 40px #7ab7ff;
     margin-bottom: 30px;
 }
+h1 span {
+    color: #ff4fa3;
+    text-shadow: 0 0 10px #ff4fa3, 0 0 20px #ff4fa3, 0 0 40px #ff4fa3;
+}
 
+/* EKRANY */
 .screen {
     display: none;
     max-width: 400px;
     margin: 0 auto;
-    background: rgba(47, 47, 79, 0.4);
+    background: rgba(47, 47, 79, 0.45);
     padding: 25px;
     border-radius: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     border: 1px solid rgba(255,255,255,0.1);
 }
-
 .active { display: block; }
 
+/* INPUTY + PRZYCISKI */
 input, button {
     display: block;
     margin: 15px auto;
@@ -67,12 +73,12 @@ button {
     font-weight: bold;
     border: 1px solid rgba(122,183,255,0.3);
 }
-
 button:hover {
     transform: translateY(-2px);
     background: linear-gradient(135deg, #3a3a63, #22224d);
 }
 
+/* STATYSTYKI */
 .profile-stats {
     text-align: left;
     background: rgba(0,0,0,0.4);
@@ -84,6 +90,7 @@ button:hover {
     line-height: 1.8;
 }
 
+/* LINKI */
 a {
     color: #7ab7ff;
     text-decoration: none;
@@ -92,31 +99,48 @@ a {
 a:hover {
     color: white;
 }
+
+/* RAMKA NA DOLE */
+.footer-box {
+    margin-top: 40px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.15);
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.9rem;
+}
 </style>
 </head>
 
 <body>
 
-<h1>People who LOVE WEAR tracksuit</h1>
+<h1>People who <span>LOVE</span> WEAR tracksuit</h1>
 
+<!-- LOGOWANIE -->
 <div id="auth" class="screen active">
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
-    <button onclick="login()">Zaloguj</button>
-    <button onclick="register()">Stwórz konto</button>
+    <button onclick="login()">🔐 Zaloguj</button>
+    <button onclick="register()">🆕 Stwórz konto</button>
 </div>
 
+<!-- MENU -->
 <div id="menu" class="screen">
     <button onclick="showScreen('app')">Wchodzę na stronę</button>
     <button onclick="showTop()">Lista TOP</button>
 </div>
 
+<!-- TOP -->
 <div id="top" class="screen">
     <h2>TOP Ranking</h2>
     <div id="topList"></div>
     <button onclick="showScreen('menu')">Powrót</button>
 </div>
 
+<!-- APLIKACJA -->
 <div id="app" class="screen">
     <button onclick="losujDres()">1. Wylosuj dres</button>
     <button onclick="bylemWDresach()">2. Byłem dziś w dresach</button>
@@ -126,6 +150,12 @@ a:hover {
     <button onclick="showScreen('menu')">Menu</button>
 
     <div id="output"></div>
+</div>
+
+<!-- RAMKA NA DOLE -->
+<div class="footer-box">
+    Jeśli zapomniałeś hasła — skontaktuj się z nami przez  
+    <a href="https://discord.com" target="_blank">Discord</a>
 </div>
 
 <script>
@@ -164,8 +194,8 @@ function showScreen(id){
 
 /* ===== REJESTRACJA ===== */
 async function register(){
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
+    const username = username.value.trim();
+    const password = password.value.trim();
 
     if(!username || !password){
         alert("Wpisz login i hasło");
@@ -187,14 +217,14 @@ async function register(){
 
 /* ===== LOGOWANIE ===== */
 async function login(){
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
+    const usernameVal = username.value.trim();
+    const passwordVal = password.value.trim();
 
     const { data } = await client
         .from("users")
         .select("*")
-        .eq("username", username)
-        .eq("password", password)
+        .eq("username", usernameVal)
+        .eq("password", passwordVal)
         .maybeSingle();
 
     if(!data){
