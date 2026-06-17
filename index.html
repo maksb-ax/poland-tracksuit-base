@@ -125,7 +125,6 @@ a:hover {
 </head>
 <body>
 
-<!-- Zastosowanie taga span w celu ostylowania samego słowa LOVE na różowo -->
 <h1>People who <span class="pink-neon">LOVE</span> WEAR tracksuit</h1>
 
 <div id="auth" class="screen active">
@@ -140,6 +139,7 @@ a:hover {
     <button onclick="showTop()">Lista TOP</button>
 </div>
 
+<!-- NAPRAWIONE: Zmieniono id z "ton" na prawidłowe "top" -->
 <div id="top" class="screen">
     <h2>TOP Ranking</h2>
     <div id="topList"></div>
@@ -158,9 +158,11 @@ a:hover {
 </div>
 
 <script>
+/* ===== KONFIGURACJA I INICJALIZACJA NA SAMYM GÓRZE ===== */
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
+// Tworzymy klienta zanim wywołają go funkcje logowania/rejestracji
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
@@ -376,7 +378,3 @@ async function showTop(){
     document.getElementById("topList").innerHTML=html;
     showScreen("top");
 }
-</script>
-
-</body>
-</html>
