@@ -5,206 +5,255 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>People who LOVE WEAR tracksuit</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-body {
-    font-family: Arial;
-    background: linear-gradient(135deg, #1f1f1f, #444);
-    color: white;
-    text-align: center;
-    padding: 30px;
+body{
+    background:#1a1a1a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    padding:30px;
 }
-
-#app {
-    display: none;
+.screen{display:none;}
+.active{display:block;}
+input,button{
+    display:block;
+    margin:10px auto;
+    padding:15px;
+    width:300px;
+    border-radius:12px;
+    border:none;
 }
-
-button {
-    display: block;
-    width: 300px;
-    margin: 10px auto;
-    padding: 15px;
-    font-size: 16px;
-    border: none;
-    border-radius: 12px;
-    background: #2F2F4F;
-    color: white;
-    cursor: pointer;
+button{
+    background:#2F2F4F;
+    color:white;
+    cursor:pointer;
 }
-
-button:hover {
-    background: #2F2F4F;
-}
-
-#output {
-    margin-top: 20px;
-    padding: 15px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-}
-a {
-    color: #2F2F4F;
-    text-decoration: none;
+#output{
+    margin-top:20px;
+    padding:20px;
 }
 </style>
 </head>
-
 <body>
 
 <h1>People who LOVE WEAR tracksuit</h1>
 
-<div id="loading">
-    <h2>⏳ Ładowanie...</h2>
+<div id="auth" class="screen active">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Zaloguj</button>
+    <button onclick="register()">Stwórz konto</button>
 </div>
 
-<div id="app">
+<div id="menu" class="screen">
+    <button onclick="showScreen('app')">Wchodzę na stronę</button>
+    <button onclick="showTop()">Lista TOP</button>
+</div>
 
-<button onclick="losujDres()">1. Wylosuj dres</button>
-<button onclick="bylemWDresach()">2. Byłem dziś w dresach</button>
-<button onclick="jakNosic()">3. Jak nosić dresy</button>
-<button onclick="polecane()">4. Polecane dresy</button>
-<button onclick="discord()">5. Discord</button>
+<div id="top" class="screen">
+    <h2>TOP Ranking</h2>
+    <div id="topList"></div>
+    <button onclick="showScreen('menu')">Powrót</button>
+</div>
 
-<div id="output"></div>
-
+<div id="app" class="screen">
+    <button onclick="losujDres()">1. Wylosuj dres</button>
+    <button onclick="bylemWDresach()">2. Byłem dziś w dresach</button>
+    <button onclick="jakNosic()">3. Jak nosić dresy</button>
+    <button onclick="polecane()">4. Polecane dresy</button>
+    <button onclick="discord()">5. Discord</button>
+    <button onclick="showScreen('menu')">Menu</button>
+    <div id="output"></div>
 </div>
 
 <script>
+const SUPABASE_URL = "https://aimyhgkpjtjjityrsmai.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY";
 
-setTimeout(() => {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    login();
-}, 5000);
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
 
 const dresy = [
-{
-name:"Nike Tech Fleece",
-url:"https://www.nike.com/pl/"
-},
-{
-name:"Cusbclo - Czarne",
-url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-schwarz"
-},
-{
-name:"Cusbclo - Szare grafitowe",
-url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-anthrazit"
-},
-{
-name:"Cusbclo - Granatowe",
-url:"https://www.cusbclo.com/collections/tracksuits-2025/products/navy-jogger"
-},
-{
-name:"Cusbclo - Zielone",
-url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-bronze-green"
-},
-{
-name:"Cusbclo - Rich red",
-url:"https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red"
-}
+"Nike Tech Fleece",
+"Cusbclo Czarne",
+"Cusbclo Szare",
+"Cusbclo Granatowe",
+"Cusbclo Zielone",
+"Cusbclo Rich Red"
 ];
 
-let users = JSON.parse(localStorage.getItem("users")) || {};
-let currentUser = "";
-
-function login(){
-let nick = prompt("Podaj nick:");
-
-if(!nick){ login(); return; }
-
-currentUser = nick.trim();
-
-if(!users[currentUser]){
-users[currentUser] = {
-days:0,
-streak:0,
-lastClick:0,
-dres:"",
-dresDays:0
-};
+function showScreen(id){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 }
 
-save();
-updateUI();
+async function register(){
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value.trim();
+
+    if(!username || !password){
+        alert("Wpisz login i hasło");
+        return;
+    }
+
+    const {error}=await client.from("users").insert([{
+        username: username,
+        password: password,
+        streak:0,
+        best_streak:0,
+        total_days:0,
+        dres:""
+    }]);
+
+    if(error){
+        alert(error.message);
+        console.log(error);
+        return;
+    }
+
+    alert("Konto stworzone");
 }
 
-function save(){
-localStorage.setItem("users",JSON.stringify(users));
+async function login(){
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value.trim();
+
+    const {data,error}=await client
+    .from("users")
+    .select("*")
+    .eq("username",username)
+    .eq("password",password)
+    .single();
+
+    if(error || !data){
+        alert("Zły login lub hasło");
+        console.log(error);
+        return;
+    }
+
+    currentUser=data;
+    showScreen("menu");
+    updateUI();
 }
 
 function updateUI(){
-let u = users[currentUser];
-
-document.getElementById("output").innerHTML =
-`👤 <b>${currentUser}</b><br>
-🔥 Passa: <b>${u.streak}</b><br>
-📅 Dni: <b>${u.days}</b><br>
-👕 Dresy na dziś: <b>${u.dres || "brak"}</b>`;
+    document.getElementById("output").innerHTML=`
+        👤 ${currentUser.username}<br>
+        🔥 Passa: ${currentUser.streak || 0}<br>
+        🏆 Best: ${currentUser.best_streak || 0}<br>
+        📅 Total: ${currentUser.total_days || 0}<br>
+        👕 Dresy: ${currentUser.dres || "brak"}
+    `;
 }
 
 function losujDres(){
-let u = users[currentUser];
+    let i=0;
 
-if(u.dresDays > 0){
-u.dresDays--;
-save();
-updateUI();
-return;
+    const interval=setInterval(()=>{
+        document.getElementById("output").innerHTML=
+        "🎡 Losowanie... " + dresy[i % dresy.length];
+        i++;
+    },200);
+
+    setTimeout(async ()=>{
+        clearInterval(interval);
+        const chosen=dresy[Math.floor(Math.random()*dresy.length)];
+        currentUser.dres=chosen;
+
+        await client
+        .from("users")
+        .update({dres:chosen})
+        .eq("id",currentUser.id);
+
+        updateUI();
+    },6000);
 }
 
-let d = dresy[Math.floor(Math.random()*dresy.length)];
-let days = Math.floor(Math.random()*3)+1;
+async function bylemWDresach(){
+    const today=new Date().toISOString().split("T")[0];
 
-u.dres = d.name;
-u.dresDays = days;
+    if(currentUser.last_click===today){
+        alert("Dzisiaj już kliknięte");
+        return;
+    }
 
-save();
-updateUI();
-}
+    let streak=1;
 
-function bylemWDresach(){
-let u = users[currentUser];
-let now = Date.now();
+    if(currentUser.last_click){
+        let last=new Date(currentUser.last_click);
+        let now=new Date(today);
+        let diff=(now-last)/(1000*60*60*24);
 
-if(u.lastClick && now - u.lastClick < 86400000){
-alert("Już kliknięte dziś");
-return;
-}
+        if(diff===1){
+            streak=currentUser.streak+1;
+        }
+    }
 
-if(u.lastClick){
-let diff = Math.floor((now - u.lastClick)/86400000);
+    let best=Math.max(streak,currentUser.best_streak || 0);
 
-if(diff===1) u.streak++;
-else u.streak=0;
-}else{
-u.streak=1;
-}
+    currentUser.streak=streak;
+    currentUser.best_streak=best;
+    currentUser.total_days=(currentUser.total_days || 0)+1;
+    currentUser.last_click=today;
 
-u.days++;
-u.lastClick = now;
+    const {error}=await client.from("users").update({
+        streak:streak,
+        best_streak:best,
+        total_days:currentUser.total_days,
+        last_click:today
+    }).eq("id",currentUser.id);
 
-save();
-updateUI();
+    if(error){
+        alert(error.message);
+        console.log(error);
+        return;
+    }
+
+    updateUI();
 }
 
 function jakNosic(){
-document.getElementById("output").innerHTML =
-"👕 Styl dresowy = wygoda + sneakersy + pewność siebie";
+    document.getElementById("output").innerHTML=
+    "👕 Czarne dresy + sneakersy + hoodie = top styl";
 }
 
 function polecane(){
-let html = "🔥 Polecane dresy:<br><br>";
-
-dresy.forEach(d=>{
-html += `<a href="${d.url}" target="_blank">${d.name}</a><br>`;
-});
-
-document.getElementById("output").innerHTML = html;
+    document.getElementById("output").innerHTML=`
+    Nike Tech Fleece<br>
+    Cusbclo Black<br>
+    Cusbclo Navy
+    `;
 }
 
 function discord(){
-window.location.href="https://discord.com/";
+    window.location="https://discord.com/";
 }
 
+async function showTop(){
+    const {data,error}=await client
+    .from("users")
+    .select("*")
+    .order("best_streak",{ascending:false})
+    .limit(10);
+
+    if(error){
+        alert(error.message);
+        console.log(error);
+        return;
+    }
+
+    let html="<h3>TOP PASSA</h3>";
+
+    data.forEach((u,i)=>{
+        html += `${i+1}. ${u.username} - ${u.best_streak || 0}<br>`;
+    });
+
+    document.getElementById("topList").innerHTML=html;
+    showScreen("top");
+}
 </script>
 
 </body>
