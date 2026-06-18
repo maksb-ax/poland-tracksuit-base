@@ -225,7 +225,7 @@ async function register(){
         return;
     }
 
-    alert("Konto stworzone!\n\nTwój PIN bezpieczeństwa to:\n\n" + pin + "\n\nZapisz go — będzie potrzebny do odzyskania hasła.");
+    alert("PIN bezpieczeństwa (zapisz go!):\n\n" + pin + "\n\nBędzie potrzebny do odzyskania hasła.");
 }
 
 /* ===== LOGOWANIE ===== */
@@ -300,4 +300,70 @@ async function bylemWDresach(){
     let streak = 1;
 
     if(currentUser.last_click){
-        const diff = (new Date(today) - new
+        const diff = (new Date(today) - new Date(currentUser.last_click)) / (1000*60*60*24);
+        if(diff === 1){
+            streak = currentUser.streak + 1;
+        }
+    }
+
+    const best = Math.max(streak, currentUser.best_streak);
+
+    currentUser.streak = streak;
+    currentUser.best_streak = best;
+    currentUser.total_days++;
+    currentUser.last_click = today;
+
+    await client.from("users").update({
+        streak,
+        best_streak: best,
+        total_days: currentUser.total_days,
+        last_click: today
+    }).eq("id", currentUser.id);
+
+    updateUI();
+}
+
+/* ===== POLECANE ===== */
+function polecane(){
+    let html = `<div class="profile-stats" style="text-align:center;">
+        <h3>Polecane dresy</h3>`;
+
+    produkty.forEach(p => {
+        html += `<div style="margin:10px 0;">
+            <a href="${p.url}" target="_blank">👕 ${p.name}</a>
+        </div>`;
+    });
+
+    html += "</div>";
+
+    output.innerHTML = html;
+}
+
+/* ===== TOP LISTA ===== */
+async function showTop(){
+    const { data } = await client
+        .from("users")
+        .select("*")
+        .order("best_streak", { ascending: false })
+        .limit(10);
+
+    let html = `<div class="profile-stats"><h3>TOP PASSA</h3>`;
+
+    data.forEach((u, i) => {
+        html += `${i+1}. <b>${u.username}</b> — ${u.best_streak}<br>`;
+    });
+
+    html += "</div>";
+
+    topList.innerHTML = html;
+    showScreen("top");
+}
+
+/* ===== DISCORD ===== */
+function discord(){
+    window.open("https://discord.com", "_blank");
+}
+</script>
+
+</body>
+</html>
