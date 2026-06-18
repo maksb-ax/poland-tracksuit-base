@@ -8,9 +8,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* TŁO GRADIENT + ZDJĘCIE Z DRESAMI */
 body {
-    background: linear-gradient(to bottom, #1a1a1a 0%, #0f1a3a 100%), url('tlo do pwlw.png');
+    background-image:
+        linear-gradient(to top, rgba(0, 20, 60, 0.9), rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.85)),
+        url('tlo.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -38,7 +39,7 @@ h1 span {
     display: none;
     max-width: 400px;
     margin: 0 auto;
-    background: rgba(47, 47, 79, 0.55);
+    background: rgba(47, 47, 79, 0.45);
     padding: 25px;
     border-radius: 20px;
     backdrop-filter: blur(12px);
@@ -59,9 +60,9 @@ input, button {
 }
 
 input {
-    background: rgba(255,255,255,0.9);
-    color: #000;
-    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
     text-align: center;
 }
 
@@ -158,6 +159,7 @@ a:hover {
 </div>
 
 <script>
+/* ===== SUPABASE ===== */
 const client = supabase.createClient(
     "https://aimyhgkpjtjjityrsmai.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbXloZ2twanRqaml0eXJzbWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTg1MzYsImV4cCI6MjA5NzE5NDUzNn0.gM8nR0-zRJmOBX55E6beEb4T0PSW-tAcCB1icrol9VY"
@@ -165,6 +167,7 @@ const client = supabase.createClient(
 
 let currentUser = null;
 
+/* ===== LISTY ===== */
 const dresy = [
     "Nike Tech Fleece",
     "Cusbclo Czarne",
@@ -183,23 +186,25 @@ const produkty = [
   { name: "Cusbclo - Rich red", url: "https://www.cusbclo.com/collections/tracksuits-2025/products/jogger-rich-red" }
 ];
 
+/* ===== EKRANY ===== */
 function showScreen(id){
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
 
+/* ===== REJESTRACJA ===== */
 async function register(){
-    const usernameVal = username.value.trim();
-    const passwordVal = password.value.trim();
+    const username = username.value.trim();
+    const password = password.value.trim();
 
-    if(!usernameVal || !passwordVal){
+    if(!username || !password){
         alert("Wpisz login i hasło");
         return;
     }
 
     await client.from("users").insert([{
-        username: usernameVal,
-        password: passwordVal,
+        username,
+        password,
         streak: 0,
         best_streak: 0,
         total_days: 0,
@@ -210,9 +215,140 @@ async function register(){
     alert("Konto stworzone!");
 }
 
+/* ===== LOGOWANIE ===== */
 async function login(){
     const usernameVal = username.value.trim();
     const passwordVal = password.value.trim();
 
     const { data } = await client
         .from("users")
+        .select("*")
+        .eq("username", usernameVal)
+        .eq("password", passwordVal)
+        .maybeSingle();
+
+    if(!data){
+        alert("Zły login lub hasło");
+        return;
+    }
+
+    currentUser = data;
+    showScreen("menu");
+}
+
+/* ===== UI ===== */
+function updateUI(){
+    output.innerHTML = `
+        <div class="profile-stats">
+            👤 <b>Użytkownik:</b> ${currentUser.username}<br>
+            🔥 <b>Passa:</b> ${currentUser.streak}<br>
+            🏆 <b>Najlepsza passa:</b> ${currentUser.best_streak}<br>
+            📅 <b>Dni w dresach:</b> ${currentUser.total_days}<br>
+            👕 <b>Dres na dziś:</b> ${currentUser.dres || "brak"}
+        </div>
+    `;
+}
+
+/* ===== LOSOWANIE ===== */
+function losujDres(){
+    let i = 0;
+
+    const interval = setInterval(() => {
+        output.innerHTML = `<div class="profile-stats" style="text-align:center;">
+            🎡 Losowanie... <br><b>${dresy[i % dresy.length]}</b>
+        </div>`;
+        i++;
+    }, 150);
+
+    setTimeout(async () => {
+        clearInterval(interval);
+
+        const chosen = dresy[Math.floor(Math.random() * dresy.length)];
+        currentUser.dres = chosen;
+
+        await client.from("users")
+            .update({ dres: chosen })
+            .eq("id", currentUser.id);
+
+        updateUI();
+    }, 2500);
+}
+
+/* ===== BYŁEM W DRESACH ===== */
+async function bylemWDresach(){
+    const today = new Date().toISOString().split("T")[0];
+
+    if(currentUser.last_click === today){
+        alert("Już dziś kliknąłeś!");
+        return;
+    }
+
+    let streak = 1;
+
+    if(currentUser.last_click){
+        const diff = (new Date(today) - new Date(currentUser.last_click)) / (1000*60*60*24);
+        if(diff === 1){
+            streak = currentUser.streak + 1;
+        }
+    }
+
+    const best = Math.max(streak, currentUser.best_streak);
+
+    currentUser.streak = streak;
+    currentUser.best_streak = best;
+    currentUser.total_days++;
+    currentUser.last_click = today;
+
+    await client.from("users").update({
+        streak,
+        best_streak: best,
+        total_days: currentUser.total_days,
+        last_click: today
+    }).eq("id", currentUser.id);
+
+    updateUI();
+}
+
+/* ===== POLECANE ===== */
+function polecane(){
+    let html = `<div class="profile-stats" style="text-align:center;">
+        <h3>Polecane dresy</h3>`;
+
+    produkty.forEach(p => {
+        html += `<div style="margin:10px 0;">
+            <a href="${p.url}" target="_blank">👕 ${p.name}</a>
+        </div>`;
+    });
+
+    html += "</div>";
+
+    output.innerHTML = html;
+}
+
+/* ===== TOP LISTA ===== */
+async function showTop(){
+    const { data } = await client
+        .from("users")
+        .select("*")
+        .order("best_streak", { ascending: false })
+        .limit(10);
+
+    let html = `<div class="profile-stats"><h3>TOP PASSA</h3>`;
+
+    data.forEach((u, i) => {
+        html += `${i+1}. <b>${u.username}</b> — ${u.best_streak}<br>`;
+    });
+
+    html += "</div>";
+
+    topList.innerHTML = html;
+    showScreen("top");
+}
+
+/* ===== DISCORD ===== */
+function discord(){
+    window.open("https://discord.com", "_blank");
+}
+</script>
+
+</body>
